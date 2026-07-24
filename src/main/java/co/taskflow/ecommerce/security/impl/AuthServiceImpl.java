@@ -2,22 +2,26 @@ package co.taskflow.ecommerce.security.impl;
 
 import co.taskflow.ecommerce.dto.request.AuthRequest;
 import co.taskflow.ecommerce.dto.request.RegisterRequest;
+import co.taskflow.ecommerce.dto.request.ResetPasswordRequest;
 import co.taskflow.ecommerce.dto.response.AuthResponse;
 import co.taskflow.ecommerce.dto.response.UserResponse;
 import co.taskflow.ecommerce.entity.Role;
 import co.taskflow.ecommerce.entity.User;
-import co.taskflow.ecommerce.exception.ConflictException;
 import co.taskflow.ecommerce.exception.UserAlreadyExistsException;
 import co.taskflow.ecommerce.exception.UserNotFoundException;
 import co.taskflow.ecommerce.jwt.JwtService;
 import co.taskflow.ecommerce.mapper.AuthMapper;
+import co.taskflow.ecommerce.mapper.UserMapper;
 import co.taskflow.ecommerce.repository.RoleRepository;
 import co.taskflow.ecommerce.repository.UserRepository;
 import co.taskflow.ecommerce.security.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +40,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthMapper mapper;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -90,5 +95,37 @@ public class AuthServiceImpl implements AuthService {
 
         return new AuthResponse(token, user.getEmail(), jwtService.getExpiration());
     }
+
+    @Override
+    public UserResponse me() {
+        User user = this.authenticate();
+        return userMapper.toResponse(user);
+    }
+
+    @Override
+    public User authenticate() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null) {
+            return userRepository.findByEmail(auth.getName())
+                    .orElseThrow(() -> new UserNotFoundException("User not found with email: " + auth.getName()));
+        }
+
+        throw new UsernameNotFoundException("User not found!");
+    }
+
+    @Override
+    public UserResponse resetPassword(ResetPasswordRequest request) {
+        User user = this.authenticate();
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Password don't match!");
+        }
+
+        String newPasswordBcrypt = passwordEncoder.encode(request.getNewPassword());
+        user.setPassword(newPasswordBcrypt);
+        return userMapper.toResponse(userRepository.save(user));
+    }
+
 
 }

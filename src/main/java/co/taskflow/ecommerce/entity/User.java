@@ -22,27 +22,45 @@ public class User extends BaseEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String username;
 
-    @Column(unique = true)
+    @Column(name = "email", nullable = false, unique = true, length = 50)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "first_name", length = 50)
     private String firstName;
+
+    @Column(name = "last_name", length = 50)
     private String lastName;
+
+    @Column(name = "phone_number", length = 12)
     private String phoneNumber;
+
+    @Column(name = "date_of_birth", length = 10, nullable = false)
     private String dateOfBirth;
+
+    @Column(name = "gender", length = 10, nullable = false)
     private String gender;
+
+    @Column(name = "profile_image", nullable = false)
     private String profileImage;
 
     private Instant lastLoginAt;
+
     private String lastLoginIp;
+
     private Integer failedLoginAttempts;
+
     private Instant lockedUtil;
 
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private RefreshToken refreshToken;
+
+    @Column(name = "user_status", nullable = false)
     private boolean status = true;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -62,3 +80,5 @@ public class User extends BaseEntity implements UserDetails {
     public String getPassword() {
         return this.password;
     }
+
+}
