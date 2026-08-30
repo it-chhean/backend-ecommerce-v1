@@ -1,6 +1,7 @@
 package co.taskflow.ecommerce.mapper;
 
 import co.taskflow.ecommerce.dto.request.RegisterRequest;
+import co.taskflow.ecommerce.dto.request.UserRequest;
 import co.taskflow.ecommerce.dto.response.UserResponse;
 import co.taskflow.ecommerce.entity.Role;
 import co.taskflow.ecommerce.entity.User;
@@ -8,8 +9,8 @@ import co.taskflow.ecommerce.exception.UserNotFoundException;
 import co.taskflow.ecommerce.repository.RoleRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.stylesheets.LinkStyle;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +29,19 @@ public class UserMapper {
         User user = new User();
         applyToUserField(user,  request);
         return user;
+    }
+
+    public User toUser(UserRequest req) {
+        if (req == null) return null;
+        List<String> roles = req.roles().stream()
+                .map(Role::getName)
+                .toList();
+        return User.builder()
+                .username(req.username())
+                .email(req.email())
+                .password(req.password())
+                .roles(roles)
+                .build();
     }
 
     public UserResponse toResponse(User user) {

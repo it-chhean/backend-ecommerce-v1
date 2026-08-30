@@ -17,12 +17,10 @@ import java.util.Set;
 @Component
 public class AuthMapper {
 
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
 
-    AuthMapper(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
-      this.userRepository = userRepository;
+    AuthMapper(PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
       this.passwordEncoder = passwordEncoder;
       this.roleRepository = roleRepository;
     }

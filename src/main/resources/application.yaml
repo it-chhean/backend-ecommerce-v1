@@ -1,5 +1,7 @@
 server:
   port: ${SPRING_APPLICATION_PORT}
+  servlet:
+    context-path: /api/v1
 
 spring:
   application:
@@ -12,7 +14,7 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    show-sql: true
+    show-sql: true 
     hibernate:
       ddl-auto: update
     properties:
@@ -23,3 +25,6 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION:900000}
+
+refresh:
+  expiry-date: 900000
