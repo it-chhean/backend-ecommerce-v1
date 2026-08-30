@@ -1,25 +1,25 @@
 server:
-  port: ${SPRING_APPLICATION_PORT:8081}
+  port: ${SPRING_APPLICATION_PORT}
+
 spring:
   application:
     name: backend_ecommerce
 
-  config:
-    import: "optional:file:.env[.yaml]"
   datasource:
-    url: jdbc:postgresql://postgres:5432/${POSTGRES_DB:taskflow_backend}
-    username: ${POSTGRES_USER:Chhean}
-    password: ${POSTGRES_PASSWORD:Chhean168}
+    url: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
     properties:
-     hibernate:
+      hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
 jwt:
-  secret: aaehhofdaueryearo123ui45454
-  expiration: 900000
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:900000}
