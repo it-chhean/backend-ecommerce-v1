@@ -2,6 +2,7 @@ package co.taskflow.ecommerce.exception;
 
 import co.taskflow.ecommerce.payload.ErrorResponse;
 import co.taskflow.ecommerce.payload.FieldErrorResponse;
+import co.taskflow.ecommerce.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,20 @@ import java.util.List;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(
+            ResourceNotFoundException ex,
+            WebRequest req
+    ) {
+        String path = req.getDescription(false).replace("uri=", "");
+        ErrorResponse error = ErrorResponse.of(
+                HttpStatus.NOT_FOUND, 
+                ex.getMessage(),
+                path
+           );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ErrorResponse> handleApp(AppException e) {

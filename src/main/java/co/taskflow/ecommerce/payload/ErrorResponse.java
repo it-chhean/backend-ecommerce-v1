@@ -9,29 +9,42 @@ import java.time.Instant;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ErrorResponse(
-        String status,
-        int code,
+        int status,
+        String error,
         String message,
-        Instant timestamp,
-        Object errorDetails
+        String path,
+        String timestamp,
+        List<String> details 
 ) {
-    public static ErrorResponse of(HttpStatus status, String message) {
+    public static ErrorResponse of(
+            HttpStatus status,
+            String error,
+            String message,
+            String path,
+    ) {
         return new ErrorResponse(
-                status.getReasonPhrase(),
                 status.value(),
+                status.getReasonPhrase(),
                 message,
-                Instant.now(),
+                path,
+                Instant.now().toString(),
                 null
         );
     }
-
-    public static ErrorResponse of(HttpStatus status, String message, Object errorDetails) {
+    public static ErrorResponse of(
+            HttpStatus status, 
+            String error, 
+            String message,
+            String path,
+            List<String> details
+    ){
         return new ErrorResponse(
-                status.getReasonPhrase(),
                 status.value(),
+                status.getReasonPhrase(),
                 message,
-                Instant.now(),
-                errorDetails
+                path,
+                Instant.now().toString(),
+                details
         );
     }
 }
